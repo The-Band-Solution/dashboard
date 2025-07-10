@@ -14,8 +14,13 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
+ENV DJANGO_SUPERUSER_USERNAME=admin \
+    DJANGO_SUPERUSER_PASSWORD=admin123 \
+    DJANGO_SUPERUSER_EMAIL=admin@example.com
+
 RUN python manage.py makemigrations 
 RUN python manage.py migrate 
 RUN python manage.py collectstatic --noinput --no-post-process
+RUN python create_superuser.py
       
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--reload", "--timeout=8000", "--workers=2", "dashboard.wsgi:application"]
