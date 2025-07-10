@@ -1,2 +1,3 @@
-# dashboard
-dashboard with data information
+# The Band Dashboard
+
+Control extraction and analysis of data from github

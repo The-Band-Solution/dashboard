@@ -1,0 +1,18 @@
+Configuration {
+    software_name: "dashboard"
+    about: "The Band Dashboard"
+    language: python
+}
+
+module Core {
+
+    
+    entity Application{
+        github: string
+        repository: string
+    }
+
+    
+    
+    
+}
