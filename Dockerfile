@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install build-essential gcc python3-dev musl-dev l
 RUN pip install -r requirements.txt
 
 COPY . .
+
 RUN python manage.py makemigrations 
 RUN python manage.py migrate 
 RUN python manage.py collectstatic --noinput --no-post-process
