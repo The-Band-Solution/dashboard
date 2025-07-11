@@ -1,26 +1,32 @@
-FROM python:3.10-slim-bullseye as python
+FROM python:3.10-slim-bullseye
 
-ENV DJANGO_SETTINGS_MODULE dashboard.settings.local
-ENV PIP_DISABLE_PIP_VERSION_CHECK 1
-ENV DEBUG true
+# Variáveis de ambiente
+ENV DJANGO_SETTINGS_MODULE=dashboard.settings.local
+#ENV PYTHONPATH=/app
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV DEBUG=true
 
+# Define o diretório de trabalho
 WORKDIR /app
 
-COPY requirements.txt .
+# Copia tudo do projeto (raiz, onde está o docker-compose.yml)
+COPY ./src/ .
 
-# Install dependencies
-RUN apt-get update && apt-get install build-essential gcc python3-dev musl-dev libpq-dev python3-dev libpq-dev libffi-dev -y
+# Instala dependências do sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    libpq-dev \
+    libffi-dev \
+    musl-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala dependências Python
 RUN pip install -r requirements.txt
-
-COPY . .
-
-ENV DJANGO_SUPERUSER_USERNAME=admin \
-    DJANGO_SUPERUSER_PASSWORD=admin123 \
-    DJANGO_SUPERUSER_EMAIL=admin@example.com
-
-RUN python manage.py makemigrations 
-RUN python manage.py migrate 
+RUN python manage.py makemigrations
+RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput --no-post-process
-RUN python create_superuser.py
-      
+
+# Inicia com Gunicorn apontando para src.dashboard.wsgi
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--reload", "--timeout=8000", "--workers=2", "dashboard.wsgi:application"]
