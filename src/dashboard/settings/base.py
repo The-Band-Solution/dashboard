@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'drf_yasg',
     'behave_django',
+    "django_celery_beat",
 # External Apps
 # Local Apps
     'apps.core',
@@ -225,3 +226,4 @@ LOGGING = {
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
