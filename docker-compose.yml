@@ -7,7 +7,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./src:/app/src
+      - .:/app
+      - ./logs:/app/logs
+    working_dir: /app/src
     depends_on:
       - db
     env_file:
@@ -15,7 +17,7 @@ services:
     
   db:
     image: postgres:15
-    container_name: dashboard_db
+    container_name: db  
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -36,9 +38,11 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: dashboard_celery
-    command: celery -A dashboard worker --loglevel=info
+    command: celery -A dashboard worker --loglevel=info -E
     volumes:
-      - ./src:/app/src
+      - .:/app
+      - ./logs:/app/logs
+    working_dir: /app/src
     depends_on:
       - app
       - redis
@@ -50,14 +54,36 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: dashboard_celery_beat
-    command: celery -A dashboard beat --loglevel=info
+    command: sh -c "celery -A dashboard beat --loglevel=info"
     volumes:
-      - ./src:/app/src
+      - .:/app
+      - ./logs:/app/logs
+    working_dir: /app/src
+    environment:
+      - PYTHONPATH=/app/src
     depends_on:
       - app
       - redis
     env_file:
       - .env
 
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dashboard_flower
+    command: celery --broker=redis://redis:6379/0 -A dashboard flower --port=5555
+    ports:
+      - "5555:5555"
+    volumes:
+      - .:/app
+    working_dir: /app/src
+    depends_on:
+      - redis
+      - app
+    env_file:
+      - .env
+
 volumes:
   postgres_data:
+  

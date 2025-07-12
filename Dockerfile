@@ -15,6 +15,7 @@ COPY ./src/ .
 # Instala dependências do sistema
 RUN apt-get update && apt-get install -y \
     build-essential \
+    netcat \
     gcc \
     libpq-dev \
     libffi-dev \
@@ -23,10 +24,15 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala dependências Python
+#RUN pip install flower
 RUN pip install -r requirements.txt
-RUN python manage.py makemigrations
-RUN python manage.py migrate
+
 RUN python manage.py collectstatic --noinput --no-post-process
+RUN mkdir -p /app/logs
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Inicia com Gunicorn apontando para src.dashboard.wsgi
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--reload", "--timeout=8000", "--workers=2", "dashboard.wsgi:application"]

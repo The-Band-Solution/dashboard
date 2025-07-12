@@ -53,4 +53,5 @@ wrapt==1.13.3
 celery>=5.3
 redis>=4.0
 django-celery-beat>=2.5
+flower>=1.2.0
 

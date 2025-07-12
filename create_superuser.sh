@@ -4,7 +4,7 @@
 CONTAINER_NAME="dashboard_the_band"
 
 # Caminho do script Python dentro do container
-SCRIPT_PATH="/app/create_superuser.py"
+SCRIPT_PATH="/app/src/create_superuser.py"
 
 echo "Executando criação de superusuário no container $CONTAINER_NAME..."
 

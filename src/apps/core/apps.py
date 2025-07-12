@@ -6,4 +6,4 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         import apps.core.signals
-        from . import beat_setup  # executa ao iniciar o Django
+      
